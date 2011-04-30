@@ -1,0 +1,471 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+<meta http-equiv="Expires" content="-1"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Cache-Control" content="No-Cache"/>
+<meta http-equiv="content-type" content="text/html; charset=euc-kr"/>
+<title>New Page for reuse knowledge WIKI</title>
+<style type = "text/css">
+span{
+	font-size: 15px;
+}
+#checkMsg{
+	font-size: 12px;
+}
+</style>
+<script type="text/javascript" src="httpRequest.js"></script>
+<script type="text/javascript">
+var checkFirst = false;  //true: 중복되는 아이디가 없음을 확인
+var lastKeyword = '';
+var loopSendKeyword = false;
+
+function checkId(){
+	if(checkFirst == false){
+	// 0.5초 후에 sendKeyword() 함수 실행
+	setTimeout("sendId();", 500);
+	loopSendKeyword = true;
+	}
+	checkFirst = true;
+}
+
+function sendId(){
+	if(loopSendKeyword == false) return;
+	
+	var keyword = document.reuse_information.asset_name.value;
+	if( keyword == ''){
+		lastKeyword = '';
+		document.getElementById('checkMsg').style.color = "black";
+		document.getElementById('checkMsg').innerHTML = "Input your asset name.";
+	} else if( keyword != lastKeyword ) {
+		lastKeyword = keyword;
+		if( keyword != '' ) {
+			var params = "id=" + encodeURIComponent(keyword);
+			sendRequest("id_check.jsp", params, displayResult, 'POST');
+		} else {
+			alert("else");
+		}
+	}
+	setTimeout("sendId();", 500);
+}		
+
+function displayResult() {
+	if( httpRequest.readyState == 4 ){
+		if( httpRequest.status == 200 ) {
+			var resultText = httpRequest.responseText;
+			var listView = document.getElementById('checkMsg');
+			if( resultText == 0 ){
+				listView.innerHTML = "You can use this asset name.";
+				listView.style.color = "blue";
+				checkFirst = true;
+			} else {
+				listView.innerHTML = "This asset name has already existed.";
+				listView.style.color = "red";
+				checkFirst = false;
+			}
+		} else {
+			alert("Error: " + httpRequest.status);
+		}
+	}
+}
+
+function check() {
+	if (checkFirst == false) {//이름이 입력하지 않았으면
+		alert("Please check your asset name.");
+		return false;
+	}
+	if (document.reuse_information.asset_name.value == "") {//이름이 입력하지 않았으면
+		alert("Please check your asset name.");
+		return false;
+	}
+	var temp = document.reuse_information.overall_description.value.replace(/ /gi, '');
+	if (temp == "") {
+		alert("Please check your overall description.");
+		return false;
+	}
+
+	if ((document.reuse_information.overall_description.value == "")
+			|| (document.reuse_information.overall_description.replace(/ /gi, '') == "")) {
+		//두가지 방법을 동시에 사용할 때
+		alert("Please check your asset name and overall description");
+		return false;
+	}
+	if ( ! isImageFile( document.reuse_information.overall_description_file.value ) ) {
+		  alert("Only image file(jpg, gif, bmp) can be uploaded.");
+		  return false;
+		 }
+
+	if ( ! isImageFile( document.reuse_information.interfaces_image.value ) ) {
+		alert("Only image file(jpg, gif, bmp) can be uploaded.");
+		  return false;
+		 }
+
+	if ( ! isImageFile( document.reuse_information.overall_description_file.value ) ) {
+		alert("Only image file(jpg, gif, bmp) can be uploaded.");
+		  return false;
+		 }
+
+	form.submit();
+}
+function check_asset()
+{
+	var asset_name = document.reuse_information.asset_name.value;
+	if( asset_name == "")
+		alert("Please check your asset name.");
+	else
+		window.open("check_assetname.jsp?asset_name=" + asset_name, "", "width=600 height=200");
+}
+ 
+/* 이미지 파일인지 알아오는 함수 */
+function isImageFile( fileName ) {
+	if( filename == "")
+		return true;
+    var fileSuffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+    fileSuffix = fileSuffix.toLowerCase();
+    if ( "jpg" == fileSuffix || "jpeg" == fileSuffix  || "gif" == fileSuffix || "bmp" == fileSuffix ) 
+        return true;
+    else 
+        return false;
+}
+function clearFileName() {
+	//alert("Before clearFilename");
+	var file1 = document.getElementsByName("overall_description_file");
+	file1[0].select();
+	//document.execCommand("Delete");
+	//alert("After clearFilename");
+	//<body onload="clearFileName()">
+}
+</script>
+</head>
+
+<body>
+		<center>
+			<h2>Create Reuse knowledge Page</h2>
+			<p>Fields marked with an asterisk (*) are required.</p>
+		</center>
+		<table class="form" border="0" align="center">
+			<tr>
+				<td>
+					<form name="reuse_information" action="create_reuse_page.jsp" method="post" onsubmit='return check()' enctype="multipart/form-data">
+						<table class="form" border="0" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="4"><b>Asset Name (*): </b>
+									<input type='text' name="asset_name" id="asset_name" style = "ime-mode:disabled" onkeydown = "javascript:checkId()"></input>
+									<span id="checkMsg"> Input your asset name.</span></td>
+								</tr>
+							</tbody>
+						</table>
+						<div> <b>Description</b></div>
+						<table class="form" border="1" width="100%">f
+							<tbody>
+								<tr class="section">
+									<td colspan="4"><b>Overall Description</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Description(*):</td>
+									<td class="required"><input type="text" name="overall_description" id="overall_description" value="2"/>
+									</td>
+									<td class="label required">Image to upload:</td>
+									<td class="required"><div id="over_file"><input type="file" name="overall_description_file" id="overall_description_file"/></div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="4"><b>Domain</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Type : </td>
+									<td class="required"><select
+										name="domain_type"
+										id="domain_type" >
+											<option value="">-- Choose from List --</option>
+											<option value="HTTP server">HTTP server</option>
+											<option value="FTP server">FTP server</option>
+											<option value="Indexing / Search">Indexing / Search</option>
+											<option value="Semantic web">--Semantic web</option>
+											<option value="Site management">Site management</option>
+											<option value="Web page management">--Web page management</option>
+											<option value="Database management">--Database management</option>
+											<option value="RSS">--RSS</option>
+											<option value="Browsers">Browsers</option>
+											<option value="Plugins and add-ons">--Plugins and add-ons</option>
+											<option value="Dynamic contents">Dynamic contents</option>
+											<option value="Page Counters">--Page Counters</option>
+											<option value="Wikis">--Wikis</option>
+											<option value="Message Boards">--Message Boards</option>
+											<option value="Blogging">--Blogging</option>
+											<option value="CGI Tools / Libraries">--CGI Tools / Libraries</option>
+											<option value="Social Networking">--Social Networking</option>
+											<option value="CMS Systems">--CMS Systems</option>
+											<option value="Groupsware">--Groupsware</option>
+											<option value="Ticketing Systems">--Ticketing Systems</option>																																	
+											<option value="User interfaces">User interfaces</option>
+											<option value="Usability">Usability</option>
+									</select>
+									</td>
+									<td class="label required">Domain Name : </td>
+									<td class="required"><input type="text" name="domain_name" id="domain_name" value="3"/>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1"  width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="4"><b>Project</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Name :</td>
+									<td class="required"><input type="text" name="project_name" id="project_name" value="4"/>
+									</td>
+									<td class="label required">Description :</td>
+									<td class="required"><input type="text" name="project_description" id="project_description" value="5"/>
+									</td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Institute :</td>
+									<td class="required"><input type="text" name="project_institute" id="project_institute" value="6"/>
+									</td>
+									<td class="label required">Duration :</td>
+									<td class="required"><input type="text" name="project_duration" id="project_duration" value="7"/>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="4"><b>Relevant Assets</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Type</td>
+									<td class="required"><select
+										name="relevant_assets_type"
+										id="relevant_assets_type" >
+											<option value="">-- Choose from List --</option>
+											<option value="SRS">SRS</option>
+											<option value="SDD">SDD</option>
+											<option value="Manual">Manual</option>
+											<option value="Binary file">Binary file</option>
+											<option value="Test Documents">Test Documents</option>
+									</select>
+									</td>
+									<td class="label required">File to upload:</td>
+									<td class="required"><div id="rele_file"><input type="file" name="relevant_assets_file" id="relevant_assets_file"/></div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="6"><b>Interfaces</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Required interfaces :</td>
+									<td class="required"><input type="text"
+										name="required_interfaces" id="required_interfaces" value="9"/>
+									</td>
+									<td class="label required">Provided interfaces :</td>
+									<td class="required"><input type="text"
+										name="provided_interfaces" id="provided_interfaces" value="10"/>
+									</td>
+									<td class="label required">Image to upload:</td>
+									<td class="required"><div id="inter_file"><input type="file" name="interfaces_image" id="interfaces_image" /></div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="2"><b>Version</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required" width="20%">File to upload:</td>
+									<td class="required"><div id="ver_file"><input type="file"	name="version_file" id="version_file"/></div></td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="4"><b>Operation Environment</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Programming language :</td>
+									<td class="required"><input type="text"
+										name="operation_env_program_language" id="operation_env_program_language" value="13"/>
+									</td>
+									<td class="label required">Operating System :</td>
+									<td class="required"><input type="text"
+										name="operation_env_operating_system" id="operation_env_operating_system" value="14"/>
+									</td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Minimal H/W Spec :</td>
+									<td class="required"><input type="text"
+										name="operation_env_minimal_hw_spec" id="operation_env_minimal_hw_spec" value="15"/>
+									</td>
+									<td class="label required">Compatible :</td>
+									<td class="required"><input type="text"
+										name="operation_env_compatible" id="operation_env_compatible" value="16"/>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr valign="top">
+									<td class="required" width="20%"><b>Required Libraries : </b></td>
+									<td class="required"><input type='text' name="required_libraries" id="required_libraries" value="17"/></td>
+								</tr>
+							</tbody>
+						</table>
+						<br/><b>Reuse Knowledge</b><br/>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="4"><b>Reuse Guidance</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Type</td>
+									<td class="required"><select
+										name="reuse_guidance_type"
+										id="reuse_guidance_type" >
+											<option value="">-- Choose from List --</option>
+											<option value="Comment">Comment</option>
+											<option value="Experience">Experience</option>
+											<option value="Feedback">Feedback</option>
+											<option value="Explicit Guideline">Explicit Guideline</option>
+									</select>
+									</td>
+									<td class="label required">Link:</td>
+									<td class="required"><input type="text"
+										name="reuse_guidance_link" id="reuse_guidance_link" value="18"/>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr valign="top">
+									<td class="required" width="20%"><b>Related Knowledge : </b></td>
+									<td class="required"><input type='text' name="related_knowledge" id="related_knowledge" value="19"/></td>
+								</tr>
+							</tbody>
+						</table>						
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="4"><b>Alternatives Assets</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Type</td>
+									<td class="required"><select
+										name="alternatives_assets_type"
+										id="alternatives_assets_type" >
+											<option value="">-- Choose from List --</option>
+											<option value="Direct">Direct</option>
+											<option value="Interfaces check">Interfaces check</option>
+											<option value="Functions check">Functions check</option>
+									</select>
+									</td>
+									<td class="label required">File to upload:</td>
+									<td class="required"><div id="alter_file"><input type="file" name="alternatives_assets_file" id="alternatives_assets_file" /></div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="6"><b>Problems</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Type :</td>
+									<td class="required"><select
+										name="problem_type" id="problem_type" >
+											<option value="">-- Choose from List --</option>
+											<option value="Reliability">Reliability</option>
+											<option value="Compatibility">Compatibility</option>
+											<option value="Interoperability">Interoperability</option>
+											<option value="Incompleteness">Incompleteness</option>
+											<option value="Visualization">Visualization</option>
+									</select>
+									</td>
+									<td class="label required">Sub type:</td>
+									<td class="required"><select
+										name="problem_subtype"
+										id="problem_subtype" >
+											<option value="">-- Choose from List --</option>
+											<option value="Control problem">Control problem</option>
+											<option value="Code failure">Code failure</option>
+											<option value="Function failure">Function failure</option>
+											<option value="">------------------</option>
+											<option value="Domain constraints">Domain constraints</option>
+											<option value="Environmental constraints">Environmental constraints</option>
+											<option value="Version problem">Version problem</option>
+											<option value="Interface problem">Interface problem</option>
+											<option value="Standardization problem">Standardization problem</option>
+											<option value="">------------------</option>
+											<option value="Dependency problem">Dependency problem</option>
+											<option value="Version problem">Version problem</option>
+											<option value="Interface problem">Interface problem</option>
+											<option value="Message problem">Message problem</option>
+											<option value="Synchronization problem">Synchronization problem</option>
+											<option value="">------------------</option>
+											<option value="Incomplete package">Incomplete package</option>
+											<option value="Incomplete function">Incomplete function</option>
+											<option value="">------------------</option>
+											<option value="Readability">Readability</option>
+											<option value="Usability">Usability</option>
+									</select>
+									</td>
+								</tr>
+								<tr class="section">
+									<td class="label required">Detail description</td>
+									<td class="required" colspan="3"><input type="text" name="problem_detail_description" id="problem_detail_description" value="21"/></td>
+								</tr>
+							</tbody>
+						</table>
+						
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="0"><b>Solutions</b></td>
+								</tr>
+							</tbody>
+						</table>
+						
+						<table class="form" border="1" width="100%">
+							<tbody>
+								<tr class="section">
+									<td colspan="6"><b>Reuse History</b></td>
+								</tr>
+								<tr valign="top">
+									<td class="label required">Reuse count :</td>
+									<td class="required"><input type="text"	name="reuse_history_count" id="reuse_history_count"	value="0" disabled="disabled"/></td>
+									<td class="label required">Reuse domain :</td>
+									<td class="required"><input type="text"	name="reuse_history_domain" id="reuse_history_domain" value="22"/></td>
+									<td class="label required">Reuse Project :</td>
+									<td class="required"><input type="text"	name="reuse_history_project" id="reuse_history_project" value="23"/></td>
+								</tr>
+							</tbody>
+						</table>
+						<center>
+						<br/>
+						<input type="submit" value="Submit" align="middle" style="height: 25px; width: 100px"/>
+						<input type="reset" value="Reset" align="middle" style="height: 25px; width: 100px"/><br/>
+						</center>
+					</form>
+					</td>
+			</tr>
+		</table>
+
+</body>
+</html>

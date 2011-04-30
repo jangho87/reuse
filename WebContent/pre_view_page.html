@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+<title>Insert title here</title>
+<script type="text/javascript">
+
+function CheckFields(pform) {
+	// 공백란 체크
+	  if ( input.asset.value   == "" ) //||          // 이름항목
+		  //input.NICNAME.value  == "" ||      // 아이디(별명)항목
+		  //input.EMAIL.value  == "" ||           // 이메일 항목
+		  //input.ADDRESS.value    == "" ||      // 주소 항목
+		  //input.POSTCODE.value    == "" ||     // 우편번호 항목
+		  //input.PHONE.value    == "" )             // 전화번호 항목
+		{
+	     alert( "필수항목 입력이 되지 않았습니다" );
+	     return false;
+	  }
+	  else {
+         alert ("'감사합니다'" +pform.asset.value + " '' n자료가 서버에 전송될동안 잠시 기다려 주세요")
+	     // 받을 이메일 주소 입력
+	     //pform.action="mailto:jaytee@dreamwiz.com";
+	     // 전송후 리다이렉트 될 페이지 설정
+         //location.href="thanks.htm";
+	     return true;
+	  }
+}
+function pop() { 
+		/*window.open*/!!
+		("팝업창파일", "pop", "width=400,height=500,history=no,resizable=no,status=no,scrollbars=yes,menubar=no")
+	}
+function linkclick() { 
+		 var e = arguments[0] || event; 
+		 var target = e.target || e.srcElement; 
+		 if(target.tagName.toLowerCase() == "a") { //클릭한 곳이 <a 태그인지 확인 
+		  window.open("새창 URL","_blank"); //팝업을 새창으로 띄우기 이외에도 원하는 이벤트처리 
+		  window.focus(); //새창이 뜬뒤 포커스를 다시 본창으로 오도록 처리 
+		 } 
+} 
+</script>
+</head>
+ 
+<body>
+	<form name="input" action="view_reuse_page.jsp" method="get" onSubmit="JavaScript:return CheckFields(this)" enctype="text/plain">
+		Asset_name : <input type="text" name="asset_name" /> 
+		<input type="submit" value="Submit" />
+	</form>
+	<a href="www.daum.net"> link </a>
+</body>
+ 
+<!-- 
+ <body onClick="linkclick()"> 
+ 
+<a href="b.html">b</a> 
+<a href="c.html">c</a> 
+</body> 
+-->
+</html>
